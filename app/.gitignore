@@ -1,0 +1,4 @@
+/build
+
+mag/src/main/res/values/developer-config.xml
+/mag/secrets.properties
