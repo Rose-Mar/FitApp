@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">mag</string>
     <string name="title_activity_map">Map</string>
+    <string name="title_activity_start_training">StartTraining</string>
+    <string name="title_activity_sign_in">SignInActivity</string>
+    <string name="title_activity_welcome">WelcomeActivity</string>
+    <string name="web_client_id">697378465778-qvgmia55rkd6a5v1sgo9ap0is6ajjfsk.apps.googleusercontent.com</string>
+
 </resources>

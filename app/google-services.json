@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "697378465778",
+    "project_id": "magi-f1065",
+    "storage_bucket": "magi-f1065.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:697378465778:android:8a07cc8ccf30b2b94cad6b",
+        "android_client_info": {
+          "package_name": "com.example.mag"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "697378465778-qvgmia55rkd6a5v1sgo9ap0is6ajjfsk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAYdXFPZN1MDat4YnaAnt4xLdTRTrIUhlQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "697378465778-qvgmia55rkd6a5v1sgo9ap0is6ajjfsk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

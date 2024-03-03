@@ -3,6 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
     id("com.google.devtools.ksp")
+    id("com.google.gms.google-services")
 
 
 
@@ -74,6 +75,13 @@ secrets {
 
 
 dependencies {
+    implementation(platform("androidx.compose:compose-bom:2023.08.00"))
+    implementation(platform("androidx.compose:compose-bom:2023.08.00"))
+    implementation(platform("androidx.compose:compose-bom:2023.08.00"))
+    implementation("com.google.firebase:firebase-auth:22.3.1")
+    androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
+    androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
+    androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
     val room_version = "2.6.1"
 
     implementation("androidx.room:room-runtime:$room_version")
@@ -116,6 +124,21 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version")
 
     ksp("androidx.room:room-compiler:2.5.0")
+
+    implementation("com.google.android.gms:play-services-location:21.1.0")
+
+    implementation(platform("com.google.firebase:firebase-bom:32.7.3"))
+//    implementation("com.google.firebase:firebase-analytics")
+    implementation ("com.firebaseui:firebase-ui-auth:7.2.0")
+//    implementation ("com.facebook.android:facebook-android-sdk:17.0.0")
+
+    implementation ("androidx.navigation:navigation-compose:2.7.7")
+
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
+
+
+
+
 
 
 

@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -15,6 +16,21 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Mag"
         tools:targetApi="34">
+        <activity
+            android:name=".startingScreens.WelcomeActivity"
+            android:exported="false"
+            android:label="@string/title_activity_welcome"
+            android:theme="@style/Theme.Mag" />
+        <activity
+            android:name=".startingScreens.SignInActivity"
+            android:exported="false"
+            android:label="@string/title_activity_sign_in"
+            android:theme="@style/Theme.Mag" />
+        <activity
+            android:name=".StartTraining"
+            android:exported="false"
+            android:label="@string/title_activity_start_training"
+            android:theme="@style/Theme.Mag" />
         <activity
             android:name=".Map"
             android:exported="false"
@@ -35,13 +51,16 @@
             </intent-filter>
         </activity>
 
+        <service
+            android:name=".ForegroundService"
+            android:foregroundServiceType="location" />
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="${MAPS_API_KEY}" />
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-
     </application>
 
 </manifest>
