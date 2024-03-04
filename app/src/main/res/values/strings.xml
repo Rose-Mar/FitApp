@@ -5,5 +5,14 @@
     <string name="title_activity_sign_in">SignInActivity</string>
     <string name="title_activity_welcome">WelcomeActivity</string>
     <string name="web_client_id">697378465778-qvgmia55rkd6a5v1sgo9ap0is6ajjfsk.apps.googleusercontent.com</string>
+    <string name="start_screen_text">Change your life with me!</string>
+    <string name="enter_password">Enter Your Password</string>
+    <string name="enter_username"> Enter Your Username</string>
+    <string name="enter_email"> Enter Your Email</string>
+    <string name="extra_quests_text">Tell me about yourself!</string>
+    <string name="enter_birthday">Enter Your Birthday</string>
+    <string name="enter_gender">Enter Your Gender</string>
+    <string name="enter_height">Enter Your Height</string>
+    <string name="enter_weight">Enter Your Weight</string>
 
 </resources>

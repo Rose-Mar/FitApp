@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.mag.startingScreens.ExtraQuestions
 import com.example.mag.startingScreens.SignUpActivity
 import com.example.mag.startingScreens.WelcomeScreen
 import com.example.mag.startingScreens.sign_in.SignInScreen
@@ -26,8 +27,8 @@ fun Navigation(coroutineScope: CoroutineScope, context: Context) {
             SignUpActivity(navController = navController)
         }
 
-        composable(route = "SignIn") {
-            
+        composable(route = "ExtraQuestions") {
+            ExtraQuestions(navController = navController)
         }
 
         composable(route = "SignInGoogle") {

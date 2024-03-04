@@ -64,6 +64,8 @@ fun SignInScreen(
                 "Sign in successful",
                 Toast.LENGTH_LONG
             ).show()
+
+            navController.navigate("ExtraQuestions")
         }
     }
 
