@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.mag.MainScreen
 import com.example.mag.startingScreens.ExtraQuestions
 import com.example.mag.startingScreens.SignUpActivity
 import com.example.mag.startingScreens.WelcomeScreen
@@ -34,6 +35,10 @@ fun Navigation(coroutineScope: CoroutineScope, context: Context) {
         composable(route = "SignInGoogle") {
             SignInScreen(navController = navController,coroutineScope = coroutineScope)
 
+        }
+        
+        composable(route = "MainScreen") {
+            MainScreen(navController = navController)
         }
     }
 }

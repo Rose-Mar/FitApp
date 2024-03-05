@@ -1,31 +1,18 @@
 package com.example.mag.compose
 
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
+import android.content.ContentValues
+import android.util.Log
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.rounded.Check
-import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -33,7 +20,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -45,7 +31,15 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.mapbox.common.OnValueChanged
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
+import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
+
+private lateinit var auth: FirebaseAuth
 
 @Composable
 fun NormalTextComponent(value:String){
@@ -62,6 +56,27 @@ fun NormalTextComponent(value:String){
     )
 }
 
+
+
+@Composable
+fun TitleTextComponent(value: String) {
+    Text(
+        text = value,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 32.dp),
+        style = TextStyle(
+            fontSize = 36.sp,
+            fontWeight = FontWeight.Bold,
+            fontStyle = FontStyle.Italic,
+            textAlign = TextAlign.Center,
+            color = Color.Black
+        )
+    )
+}
+
+
+
 @Composable
 fun PasswordTextInput(value: String, onValueChanged: (String) -> Unit){
     var text by remember { mutableStateOf("") }
@@ -73,7 +88,8 @@ fun PasswordTextInput(value: String, onValueChanged: (String) -> Unit){
             .fillMaxWidth(),
         label = { Text(text = value) },
         placeholder = { Text(text = "") },
-        visualTransformation = PasswordVisualTransformation(),
+        visualTransformation = if (passwordVisible) VisualTransformation.None
+        else PasswordVisualTransformation(),
         onValueChange = {
             text = it
             onValueChanged(it)
@@ -81,13 +97,15 @@ fun PasswordTextInput(value: String, onValueChanged: (String) -> Unit){
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         trailingIcon = {
             val image = if (passwordVisible)
-                Icons.Filled.Done
-            else Icons.Filled.Close
+                painterResource(com.firebase.ui.auth.R.drawable.design_ic_visibility)
+            else
+                painterResource(com.firebase.ui.auth.R.drawable.design_ic_visibility_off)
+
 
             val description = if (passwordVisible) "Hide password" else "Show password"
 
             IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                Icon(imageVector = image, description)
+                Icon(painter = image, contentDescription = description)
             }
         }
 
@@ -199,10 +217,66 @@ fun TextInputs() {
     }
 }
 
-@Preview
 @Composable
-fun PreviewInputs() {
-    Column {
-        TextInputs()
+fun SignUpButton(navController: NavController, email: String, password: String) {
+    Button(onClick = {
+
+        auth = FirebaseAuth.getInstance()
+
+        auth.createUserWithEmailAndPassword(email, password)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d(ContentValues.TAG, "createUserWithEmail:success")
+                    val user = auth.currentUser
+
+
+                    navController.navigate("ExtraQuestions")
+                } else {
+
+                    Log.w(ContentValues.TAG, "createUserWithEmail:failure", task.exception)
+//                    Toast.makeText(
+//                        applicationContext,
+//                        "Authentication failed: ${task.exception?.message}",
+//                        Toast.LENGTH_SHORT
+//                    ).show()
+                }
+            }
+
+    },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        colors = ButtonDefaults.buttonColors(
+            contentColor = Color.White
+        )
+    ) {
+
+
+        Text(text = "Sign up")
+
     }
 }
+
+
+@Composable
+fun BasicNavigationButton(navController: NavController, value: String, route: String){
+    Button(onClick = {
+
+        navController.navigate(route)
+
+    },
+    modifier = Modifier
+    .fillMaxWidth()
+    .padding(horizontal = 16.dp),
+    colors = ButtonDefaults.buttonColors(
+    contentColor = Color.White
+    )
+    ) {
+
+
+        Text(text = value)
+
+    }
+}
+
+

@@ -15,8 +15,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.navigation.NavController
 import com.example.mag.R
-import com.example.mag.compose.NormalTextComponent
+import com.example.mag.compose.BasicNavigationButton
 import com.example.mag.compose.NormalTextInput
+import com.example.mag.compose.TitleTextComponent
 
 @Composable
 fun ExtraQuestions(navController: NavController){
@@ -45,7 +46,7 @@ fun ExtraQuestions(navController: NavController){
         color = MaterialTheme.colorScheme.background
     ) {
         Column {
-            NormalTextComponent(value = stringResource(id = R.string.extra_quests_text))
+            TitleTextComponent(value = stringResource(id = R.string.extra_quests_text))
             
             NormalTextInput(
                 value = stringResource(id = R.string.enter_username),
@@ -73,9 +74,10 @@ fun ExtraQuestions(navController: NavController){
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
 
 
-
-
-
+            BasicNavigationButton(
+                navController,
+                value = "Let's start!",
+                route = "MainScreen")
 
         }
         
