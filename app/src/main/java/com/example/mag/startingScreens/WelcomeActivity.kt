@@ -1,5 +1,11 @@
 package com.example.mag.startingScreens
 
+import android.content.ContentValues
+import android.content.ContentValues.TAG
+import android.content.Context
+import android.content.SharedPreferences
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -38,16 +44,19 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.mag.R
 import com.example.mag.compose.NormalTextInput
-import com.example.mag.compose.PasswordTextInput
-import com.example.mag.compose.SignUpButton
 import com.example.mag.compose.TitleTextComponent
+import com.example.mag.compose.signComponents.LoginButton
+import com.example.mag.compose.signComponents.LoginViaMail
+import com.example.mag.compose.signComponents.PasswordTextInput
+import com.example.mag.compose.signComponents.SignUpButton
 import com.example.mag.startingScreens.ui.theme.MagTheme
+import com.google.firebase.auth.FirebaseAuth
 
-
-
+private lateinit var auth: FirebaseAuth
 
 @Composable
-fun WelcomeScreen(navController: NavController) {
+fun WelcomeScreen(navController: NavController, context: Context) {
+
 
 
      var email by remember {
@@ -55,6 +64,8 @@ fun WelcomeScreen(navController: NavController) {
      }
      var password by remember {
          mutableStateOf("")}
+
+
 
 
     MagTheme {
@@ -84,7 +95,7 @@ fun WelcomeScreen(navController: NavController) {
                     onValueChanged = { newValue -> password = newValue }
                 )
 
-                SignUpButton(navController, email = email, password = password)
+                SignUpButton(navController, email = email, password = password, context = context)
 
                 LoginViaMail(navController = navController)
 
@@ -132,63 +143,10 @@ fun WelcomeScreen(navController: NavController) {
 
 
 
-@Composable
-fun LoginButton(
-    appName: String,
-    icon: Painter,
-    onClick: () -> Unit
-){
-    Row (
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-            .clickable { onClick() },
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            painter = icon,
-            contentDescription = "Login with $appName",
-//            tint = MaterialTheme.colors.primary,
-            modifier = Modifier.size(48.dp),
-        )
-        Spacer(modifier = Modifier.width(16.dp))
-        Text(
-            text = "Log in with $appName",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black
-        )
-    }
-}
 
 
-@Composable
-fun LoginViaMail(navController: NavController) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = "Already have an account?",
-            modifier = Modifier.padding(end = 8.dp)
-        )
-        Button(
-            onClick = {
-                navController.navigate("SignIn")
-            },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Transparent,
-                contentColor =Color.Blue
-            ),
-            contentPadding = PaddingValues(horizontal = 0.dp)
-        ) {
-            Text(
-                text = "Login",
-                color = Color.Blue
-            )
-        }
-    }
-}
+
+
 
 
 

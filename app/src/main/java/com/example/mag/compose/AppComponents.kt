@@ -1,7 +1,5 @@
 package com.example.mag.compose
 
-import android.content.ContentValues
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -11,7 +9,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -26,20 +23,15 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavController
-import com.google.firebase.auth.FirebaseAuth
 
-private lateinit var auth: FirebaseAuth
 
 @Composable
 fun NormalTextComponent(value:String){
@@ -77,40 +69,7 @@ fun TitleTextComponent(value: String) {
 
 
 
-@Composable
-fun PasswordTextInput(value: String, onValueChanged: (String) -> Unit){
-    var text by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) }
-    OutlinedTextField(
-        value = text,
-        modifier = Modifier
-            .padding(8.dp)
-            .fillMaxWidth(),
-        label = { Text(text = value) },
-        placeholder = { Text(text = "") },
-        visualTransformation = if (passwordVisible) VisualTransformation.None
-        else PasswordVisualTransformation(),
-        onValueChange = {
-            text = it
-            onValueChanged(it)
-        },
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-        trailingIcon = {
-            val image = if (passwordVisible)
-                painterResource(com.firebase.ui.auth.R.drawable.design_ic_visibility)
-            else
-                painterResource(com.firebase.ui.auth.R.drawable.design_ic_visibility_off)
 
-
-            val description = if (passwordVisible) "Hide password" else "Show password"
-
-            IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                Icon(painter = image, contentDescription = description)
-            }
-        }
-
-    )
-}
 
 
 @Composable
@@ -217,52 +176,15 @@ fun TextInputs() {
     }
 }
 
-@Composable
-fun SignUpButton(navController: NavController, email: String, password: String) {
-    Button(onClick = {
 
-        auth = FirebaseAuth.getInstance()
-
-        auth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    Log.d(ContentValues.TAG, "createUserWithEmail:success")
-                    val user = auth.currentUser
-
-
-                    navController.navigate("ExtraQuestions")
-                } else {
-
-                    Log.w(ContentValues.TAG, "createUserWithEmail:failure", task.exception)
-//                    Toast.makeText(
-//                        applicationContext,
-//                        "Authentication failed: ${task.exception?.message}",
-//                        Toast.LENGTH_SHORT
-//                    ).show()
-                }
-            }
-
-    },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        colors = ButtonDefaults.buttonColors(
-            contentColor = Color.White
-        )
-    ) {
-
-
-        Text(text = "Sign up")
-
-    }
-}
 
 
 @Composable
-fun BasicNavigationButton(navController: NavController, value: String, route: String){
+fun BasicNavigationButton(navController: NavController, value: String, route: String, onClickAction: () -> Unit){
     Button(onClick = {
 
         navController.navigate(route)
+        onClickAction()
 
     },
     modifier = Modifier

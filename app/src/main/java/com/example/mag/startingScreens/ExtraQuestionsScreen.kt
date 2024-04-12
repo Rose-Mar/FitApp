@@ -1,5 +1,8 @@
 package com.example.mag.startingScreens
 
+import android.content.Context
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.text.KeyboardOptions
@@ -18,9 +21,10 @@ import com.example.mag.R
 import com.example.mag.compose.BasicNavigationButton
 import com.example.mag.compose.NormalTextInput
 import com.example.mag.compose.TitleTextComponent
+import com.example.mag.database.PreferencesManager
 
 @Composable
-fun ExtraQuestions(navController: NavController){
+fun ExtraQuestions(navController: NavController, context: Context){
 
 
     var username by remember {
@@ -38,7 +42,14 @@ fun ExtraQuestions(navController: NavController){
         mutableStateOf("")
     }
 
+    val prefsManager = remember {
+        PreferencesManager(context)
+    }
 
+
+
+    Log.d("SharedPreferences", "Username: ${prefsManager.getData("username", "")}")
+    Log.d("SharedPreferences", "IsLogged: ${prefsManager.getLogin(false)}")
 
 
     Surface(
@@ -74,10 +85,26 @@ fun ExtraQuestions(navController: NavController){
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
 
 
-            BasicNavigationButton(
-                navController,
-                value = "Let's start!",
-                route = "MainScreen")
+            if(username.isNotEmpty() && birthday.isNotEmpty()&& gender.isNotEmpty()&& height.isNotEmpty() && weight.isNotEmpty()) {
+
+                BasicNavigationButton(
+                    navController,
+                    value = "Let's start!",
+                    route = "MainScreen",
+                    onClickAction = {
+                        prefsManager.saveData(
+                            username,
+                            birthday,
+                            gender,
+                            height.toInt(),
+                            weight.toInt(),
+                            true
+                        )
+                    })
+            }
+            //            else{
+//                Toast.makeText(context, "Fill the information!", Toast.LENGTH_SHORT).show()
+//            }
 
         }
         

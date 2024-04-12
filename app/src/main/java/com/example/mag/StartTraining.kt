@@ -1,19 +1,18 @@
 package com.example.mag
 
 import android.Manifest
-import android.content.Intent
+import android.app.AlertDialog
+import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -24,11 +23,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.example.mag.MainActivity
+import androidx.navigation.NavController
 import com.example.mag.compose.AlertDialogExample
 import com.example.mag.ui.theme.MagTheme
+import com.example.mag.utils.CheckForLocationPermission
+import com.example.mag.utils.CheckServicePermission
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -36,62 +37,58 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.LocationSettingsRequest
-import com.google.android.gms.location.LocationSettingsResponse
-import com.google.android.gms.location.LocationSettingsStatusCodes
-import com.google.android.gms.location.LocationSettingsStates
-import com.google.android.gms.location.LocationSettingsStatusCodes.SUCCESS
-import com.google.android.gms.location.LocationSettingsStatusCodes.RESOLUTION_REQUIRED
 import com.google.android.gms.location.Priority
 
 
 
 private lateinit var fusedLocationClient: FusedLocationProviderClient
 
+private var requestingLocationUpdates by mutableStateOf(true)
+
+    private const val MY_PERMISSIONS_REQUEST_LOCATION = 99
+    private const val MY_PERMISSIONS_REQUEST_BACKGROUND_LOCATION = 66
 
 
 
-class StartTraining : ComponentActivity() {
+@Composable
+fun StartTraining(navController: NavController, context: Context) {
+    fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
 
-    private var requestingLocationUpdates by mutableStateOf(true)
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-
-
-
-        setContent {
-            MagTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    CheckServicePermission()
-                    ToggleLocationUpdatesButton(requestingLocationUpdates) {
-                        requestingLocationUpdates = !requestingLocationUpdates
-                        if (requestingLocationUpdates) {
-                            val locationRequest = createLocationRequest()
-                            startLocationUpdates(locationRequest)
-                        } else {
-                            stopLocationUpdates()
-                        }
-                    }
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
+    ) {
+        CheckServicePermission()
+        if (CheckForLocationPermission(context = context)) {
+            ToggleLocationUpdatesButton(requestingLocationUpdates) {
+                requestingLocationUpdates = !requestingLocationUpdates
+                if (requestingLocationUpdates) {
+                    val locationRequest = createLocationRequest()
+                    startLocationUpdates(locationRequest, context = context)
+                } else {
+                    stopLocationUpdates()
                 }
             }
-        }
 
-    }
 
-    override fun onResume() {
-        super.onResume()
-        if (requestingLocationUpdates) {
-            val locationRequest = createLocationRequest()
-            startLocationUpdates(locationRequest)
+
+            if (requestingLocationUpdates) {
+                val locationRequest = createLocationRequest()
+                startLocationUpdates(locationRequest, context)
+            }
+        }else{
+
+
+            Button(
+                onClick = {
+                    requestLocationPermission(context as ComponentActivity)
+                }
+            ) {
+                Text("Zezwól na lokalizację")
+            }
         }
     }
+}
 
 
     private fun createLocationRequest(): LocationRequest {
@@ -103,7 +100,7 @@ class StartTraining : ComponentActivity() {
             .build()
     }
 
-    private fun startLocationUpdates(locationRequest: LocationRequest) {
+    private fun startLocationUpdates(locationRequest: LocationRequest, context: Context) {
         val locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
                 locationResult.locations.forEach { location ->
@@ -118,7 +115,7 @@ class StartTraining : ComponentActivity() {
 
 
         if (ContextCompat.checkSelfPermission(
-                this,
+                context,
                 Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
         ) {
             fusedLocationClient.requestLocationUpdates(
@@ -129,23 +126,98 @@ class StartTraining : ComponentActivity() {
             Log.e("Location Updates", "Location permission not granted")
         }
     }
+
+
+
+// Funkcja do wywołania, aby poprosić użytkownika o uprawnienia do lokalizacji
+//private fun requestLocationPermission(activity: ComponentActivity) {
+//    ActivityCompat.requestPermissions(
+//        activity,
+//        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+//        LOCATION_PERMISSION_REQUEST_CODE
+//    )
+//}
+
+private fun checkLocationPermission(activity: ComponentActivity) {
+    if (ActivityCompat.checkSelfPermission(
+            activity,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED
+    ) {
+        // Should we show an explanation?
+        if (ActivityCompat.shouldShowRequestPermissionRationale(
+                activity,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+        ) {
+            // Show an explanation to the user *asynchronously* -- don't block
+            // this thread waiting for the user's response! After the user
+            // sees the explanation, try again to request the permission.
+            AlertDialog.Builder(activity)
+                .setTitle("Location Permission Needed")
+                .setMessage("This app needs the Location permission, please accept to use location functionality")
+                .setPositiveButton(
+                    "OK"
+                ) { _, _ ->
+                    //Prompt the user once explanation has been shown
+                    requestLocationPermission(activity)
+                }
+                .create()
+                .show()
+        } else {
+            // No explanation needed, we can request the permission.
+            requestLocationPermission(activity)
+        }
+    } else {
+        checkBackgroundLocation(activity)
+    }
 }
+private fun checkBackgroundLocation(activity: ComponentActivity) {
+    if (ActivityCompat.checkSelfPermission(
+            activity,
+            Manifest.permission.ACCESS_BACKGROUND_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED
+    ) {
+        requestBackgroundLocationPermission(activity)
+    }
+}
+
+private fun requestLocationPermission(activity: ComponentActivity) {
+    ActivityCompat.requestPermissions(
+        activity,
+        arrayOf(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+        ),
+        MY_PERMISSIONS_REQUEST_LOCATION
+    )
+}
+
+private fun requestBackgroundLocationPermission(activity: ComponentActivity) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        ActivityCompat.requestPermissions(
+            activity,
+            arrayOf(
+                Manifest.permission.ACCESS_BACKGROUND_LOCATION
+            ),
+            MY_PERMISSIONS_REQUEST_BACKGROUND_LOCATION
+        )
+    } else {
+        ActivityCompat.requestPermissions(
+            activity,
+            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+            MY_PERMISSIONS_REQUEST_LOCATION
+        )
+    }
+}
+
+
+
 
 private fun stopLocationUpdates() {
     // Do whatever is needed to stop location updates
 }
 
-@Composable
-fun CheckServicePermission() {
-    val playServicesAvailable = checkPlayService()
-    if (!playServicesAvailable) {
-        AlertDialogExample(
-            dialogTitle = "You don't have play service",
-            dialogText = "You can do nothing, bye bye",
-            icon = Icons.Default.Info
-        )
-    }
-}
+
 
 @Composable
 fun checkPlayService(): Boolean {

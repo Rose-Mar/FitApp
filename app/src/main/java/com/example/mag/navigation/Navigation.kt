@@ -1,35 +1,62 @@
 package com.example.mag.navigation
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.mag.MainScreen
+import com.example.mag.StartTraining
+import com.example.mag.database.PreferencesManager
 import com.example.mag.startingScreens.ExtraQuestions
-import com.example.mag.startingScreens.SignUpActivity
+import com.example.mag.startingScreens.SignIn
+
 import com.example.mag.startingScreens.WelcomeScreen
 import com.example.mag.startingScreens.sign_in.SignInScreen
+import com.google.android.gms.location.LocationRequest
 import kotlinx.coroutines.CoroutineScope
 
 
 @Composable
 fun Navigation(coroutineScope: CoroutineScope, context: Context) {
     val navController = rememberNavController()
+    val sp = PreferencesManager(context)
+
+    val startDestination: String
+    Log.d("SharedPreferences", "Username: ${sp.getData("username", "")}")
+    Log.d("SharedPreferences", "IsLogged: ${sp.getLogin(false)}")
+    Log.d("SharedPreferences", "isFilled: ${sp.getIsFill("isFill", false)}")
+
+    Log.d("SharedPreferences", "isFilled: ${sp.getData("username", "")}")
 
 
-    NavHost(navController = navController, startDestination = "WelcomeActivity") {
-        composable(route = "WelcomeActivity") {
-            WelcomeScreen(navController)
 
+    val isLoggedIn = sp.getLogin(false)
+    val isFilled = sp.getIsFill("isFill", false)
+
+    startDestination = if (isLoggedIn) {
+        if (isFilled) {
+            "MainScreen"
+        } else {
+            "ExtraQuestions"
         }
+    } else {
+        "WelcomeActivity"
+    }
 
-        composable(route = "SignUpActivity") {
-            SignUpActivity(navController = navController)
+
+
+    NavHost(navController = navController, startDestination = startDestination) {
+
+
+        composable(route = "WelcomeActivity") {
+            WelcomeScreen(navController, context)
         }
 
         composable(route = "ExtraQuestions") {
-            ExtraQuestions(navController = navController)
+            ExtraQuestions(navController = navController, context = context)
         }
 
         composable(route = "SignInGoogle") {
@@ -38,7 +65,13 @@ fun Navigation(coroutineScope: CoroutineScope, context: Context) {
         }
         
         composable(route = "MainScreen") {
-            MainScreen(navController = navController)
+            MainScreen(navController = navController, context =context)
+        }
+        composable(route= "SignIn"){
+            SignIn(navController = navController, context = context)
+        }
+        composable(route= "StartTraining"){
+            StartTraining(navController = navController, context = context)
         }
     }
 }
