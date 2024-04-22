@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -15,6 +17,7 @@ android {
     namespace = "com.example.mag"
     compileSdk = 34
 
+
     defaultConfig {
         applicationId = "com.example.mag"
         minSdk = 21
@@ -26,6 +29,11 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        val properties = Properties()
+        properties.load(project.rootProject.file("secrets.properties").inputStream())
+        buildConfigField("String", "MAPS_API_KEY", properties.getProperty("MAPS_API_KEY"))
+
     }
 
     buildTypes {

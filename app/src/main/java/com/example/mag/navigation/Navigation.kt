@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.mag.MainScreen
+import com.example.mag.RandomPathTry
 import com.example.mag.StartTraining
 import com.example.mag.database.PreferencesManager
 import com.example.mag.startingScreens.ExtraQuestions
@@ -72,6 +73,9 @@ fun Navigation(coroutineScope: CoroutineScope, context: Context) {
         }
         composable(route= "StartTraining"){
             StartTraining(navController = navController, context = context)
+        }
+        composable(route= "RandomPathTry"){
+            RandomPathTry(navController = navController, context = context)
         }
     }
 }
