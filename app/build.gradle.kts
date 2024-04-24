@@ -123,6 +123,7 @@ dependencies {
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+    implementation("com.google.maps:google-maps-services:0.15.0")
 
 
     val lifecycle_version = "2.7.0"

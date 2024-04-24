@@ -11,11 +11,17 @@ import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
 import androidx.navigation.NavController
+import com.example.mag.BuildConfig.MAPS_API_KEY
+import com.example.mag.adapter.LatLngAdapter
+import com.example.mag.path.checkLocationPermission
+import com.example.mag.path.randomPoint
+import com.example.mag.path.requestLocationPermission
 import com.example.mag.utils.CheckServicePermission
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -24,18 +30,24 @@ import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.PolylineOptions
+import com.google.maps.DirectionsApi
+import com.google.maps.GeoApiContext
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.model.DirectionsResult
+import com.google.maps.model.TravelMode
 import kotlin.math.*
 import kotlin.random.Random
 
 private lateinit var fusedLocationClient: FusedLocationProviderClient
-private const val MY_PERMISSIONS_REQUEST_LOCATION = 99
+
 var lastLocation = LatLng(23.10, 21.0122)
-private var pointsx = mutableListOf<LatLng>()
+
+private var points = mutableListOf<LatLng>()
 
 
 @Composable
 fun RandomPathTry(navController: NavController, context: Context){
-
 
 
     fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
@@ -55,7 +67,10 @@ fun RandomPathTry(navController: NavController, context: Context){
                     val longitude = location.longitude
                     Log.d(TAG, "Last location: $latitude, $longitude")
 
-                    randomPoint()
+                    points = randomPoint()
+
+
+
 
                                 } else {
                     Log.d(TAG, "No location available")
@@ -69,7 +84,6 @@ fun RandomPathTry(navController: NavController, context: Context){
         requestLocationPermission(context)
         checkLocationPermission(context)
     }
-
 
 
 
@@ -88,13 +102,88 @@ fun RandomPathTry(navController: NavController, context: Context){
                         .build()
                     googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
 
-                    pointsx.forEach { point ->
-                        val marker = MarkerOptions()
-                            .position(LatLng(point.latitude, point.longitude))
-                            .title("Point on map")
-                        googleMap.addMarker(marker)
 
+
+
+
+//                    pointsx.forEach { point ->
+//                        val marker = MarkerOptions()
+//                            .position(LatLng(point.latitude, point.longitude))
+//                            .title("Point on map")
+//                        googleMap.addMarker(marker)
+//
+//                    }
+
+
+                    val googleMapsLatLng = points.map {
+                        LatLngAdapter.toGoogleMapsLatLng(it)}
+
+                    val contextNavi = GeoApiContext.Builder()
+                        .apiKey(MAPS_API_KEY)
+                        .build()
+
+                    val result: DirectionsResult = DirectionsApi.newRequest(contextNavi)
+                        .origin(com.google.maps.model.LatLng(lastLocation.latitude, lastLocation.longitude))
+                        .destination(com.google.maps.model.LatLng(points.last().latitude, points.last().longitude))
+                        .waypoints(*googleMapsLatLng.toTypedArray())
+                        .mode(TravelMode.WALKING)
+                        .await()
+
+
+                    val route = result.routes[0]
+                    val legs = route.legs
+                    val polylineOptions = PolylineOptions()
+                    for (leg in legs) {
+                        val steps = leg.steps
+                        for (step in steps) {
+                            val points = step.polyline.decodePath()
+                            for (point in points) {
+                                polylineOptions.add(LatLng(point.lat, point.lng))
+
+//                                val marker = MarkerOptions()
+//                                    .position(LatLng(point.lat, point.lng))
+//                                    .title("Point on route")
+//                                googleMap.addMarker(marker)
+                            }
+                        }
                     }
+
+                    val uniquePoints = mutableListOf<LatLng>()
+
+
+                    for (leg in legs) {
+                        val steps = leg.steps
+                        for (step in steps) {
+                            val points = step.polyline.decodePath()
+                            for (point in points) {
+                                val latLng = LatLng(point.lat, point.lng)
+                                // Sprawdź, czy punkt już istnieje w liście uniquePoints
+                                if (!uniquePoints.contains(latLng)) {
+                                    // Dodaj punkt do listy unikalnych punktów
+                                    uniquePoints.add(latLng)
+                                }else{
+                                    uniquePoints.remove(latLng)
+                                }
+                            }
+                        }
+                    }
+//                    uniquePoints.forEach { point ->
+//                        val marker = MarkerOptions()
+//                            .position(LatLng(point.latitude, point.longitude))
+//                            .title("Unique Point")
+//                        googleMap.addMarker(marker)
+//                    }
+
+                    val newPolylineOptions = PolylineOptions()
+
+                    uniquePoints.forEach { point ->
+                        newPolylineOptions.add(point)
+                    }
+
+                    googleMap.addPolyline(newPolylineOptions)
+                    
+
+
                 }
             }
             mapView
@@ -105,103 +194,4 @@ fun RandomPathTry(navController: NavController, context: Context){
 }
 
 
-private fun checkLocationPermission(context: Context) {
-    if (context is ComponentActivity) {
-        if (ActivityCompat.checkSelfPermission(
-                context,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(
-                    context,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                )
-            ) {
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-                AlertDialog.Builder(context)
-                    .setTitle("Location Permission Needed")
-                    .setMessage("This app needs the Location permission, please accept to use location functionality")
-                    .setPositiveButton(
-                        "OK"
-                    ) { _, _ ->
-                        //Prompt the user once explanation has been shown
-                        requestLocationPermission(context)
-                    }
-                    .create()
-                    .show()
-            } else {
-                // No explanation needed, we can request the permission.
-                requestLocationPermission(context)
-            }
-        } else {
 
-        }
-    }
-}
-
-
-private fun requestLocationPermission(context: Context) {
-    if (context is ComponentActivity) {
-        ActivityCompat.requestPermissions(
-            context,
-            arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-            ),
-            MY_PERMISSIONS_REQUEST_LOCATION
-        )
-    } else {
-        Log.e(TAG, "Context is not an instance of ComponentActivity")
-    }
-}
-
-
-fun distanceBetweenPoints(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
-    val earthRadius = 6371.0
-    val dLat = Math.toRadians(lat2 - lat1)
-    val dLon = Math.toRadians(lon2 - lon1)
-    val a = sin(dLat / 2) * sin(dLat / 2) + cos(Math.toRadians(lat1)) * cos(Math.toRadians(lat2)) *
-            sin(dLon / 2) * sin(dLon / 2)
-    val c = 2 * atan2(sqrt(a), sqrt(1 - a))
-    return earthRadius * c
-}
-
-fun generatePointsInDistance(location: LatLng, distance: Double, numPoints: Int, initialDirectionAngle: Double): List<LatLng> {
-    val points = mutableListOf<LatLng>()
-    var currentLocation = location
-    var directionAngle = initialDirectionAngle
-    for (i in 1..numPoints) {
-        directionAngle += Random.nextDouble(-60.0, 60.0)
-
-        val lat = currentLocation.latitude + (distance / 111.0) * cos(Math.toRadians(directionAngle))
-        val lon = currentLocation.longitude + (distance / (111.0 * cos(Math.toRadians(currentLocation.latitude)))) *
-                sin(Math.toRadians(directionAngle))
-        points.add(LatLng(lat, lon))
-        currentLocation = LatLng(lat, lon)
-    }
-    return points
-}
-
-
-
-fun randomPoint() {
-    val myLocation = lastLocation
-    val targetDistance = 2.0
-    val numPoints = ceil(targetDistance / 0.1).toInt()
-    val directionAngle = Random.nextDouble() * 360.0
-
-    val points = generatePointsInDistance(myLocation, 0.1, numPoints, directionAngle)
-    var totalDistance = 0.0
-    for (i in 0 until points.size - 1) {
-        val distance = distanceBetweenPoints(
-            points[i].latitude, points[i].longitude,
-            points[i + 1].latitude, points[i + 1].longitude
-        )
-        totalDistance += distance
-    }
-    pointsx.addAll(points)
-    Log.d(TAG, "Points count: ${points.size}")
-    Log.d(TAG, "Distance: $totalDistance km")
-}
