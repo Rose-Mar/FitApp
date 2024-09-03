@@ -29,8 +29,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavController
+import com.example.mag.R
 
 
 @Composable
@@ -73,45 +75,34 @@ fun TitleTextComponent(value: String) {
 
 
 @Composable
-fun NormalTextInput(value: String,onValueChanged: (String) -> Unit, keyboardOptions: KeyboardOptions){
-    var text by remember { mutableStateOf("") }
+fun NormalTextInput(
+    value: String,
+    label: String,
+    onValueChanged: (String) -> Unit,
+    keyboardOptions: KeyboardOptions
+) {
     OutlinedTextField(
-        value = text,
+        value = value,
+        onValueChange = onValueChanged,
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth(),
-        label = { Text(text = value) },
-        placeholder = { Text(text = "") },
-//        visualTransformation = PasswordVisualTransformation(),
-        onValueChange = {
-            text = it
-            onValueChanged(it)
-        },
-        keyboardOptions = keyboardOptions,
-
+        label = { Text(text = label) },
+        keyboardOptions = keyboardOptions
     )
+}
 
-}
-@Preview
-@Composable
-fun PreviewBasicInput() {
-    Column {
-//        NormalTextInput("Email","tej" ,KeyboardOptions(keyboardType = KeyboardType.Email))
-    }
-}
+
+
+
 
 @Composable
 fun TextInputs() {
     Column {
 
         Text(text = "Text Inputs",
-//            style = typography.h6,
             modifier = Modifier.padding(8.dp))
         var text by remember { mutableStateOf(TextFieldValue("")) }
-        // for preview add same text to all the fields
-
-        // Normal Text Input field with floating label
-        // placeholder is same as hint in xml of edit text
         TextField(
             value = text,
             onValueChange = { newValue -> text = newValue },
@@ -122,11 +113,6 @@ fun TextInputs() {
             placeholder = { Text("placeholder") },
         )
 
-        // Outlined Text Input Field
-
-
-        // Outlined Input text with icon on the left
-        // inside leadingIcon property add the icon
         OutlinedTextField(
             value = text,
             leadingIcon = { Icon(imageVector = Icons.Default.Email, contentDescription = null) },
@@ -141,9 +127,6 @@ fun TextInputs() {
             }
         )
 
-        // Outlined Input text with icon on the left and right
-        // inside leadingIcon property add the left icon
-        // inside trailingIcon property add right icon
         OutlinedTextField(
             value = text,
             leadingIcon = { Icon(imageVector = Icons.Default.Email, contentDescription = null) },
@@ -160,8 +143,6 @@ fun TextInputs() {
         )
 
         var numberText by remember { mutableStateOf(TextFieldValue("")) }
-        // Outlined Text input field with input type number
-        // It will open the number keyboard
         OutlinedTextField(value = numberText,
             modifier = Modifier
                 .padding(8.dp)

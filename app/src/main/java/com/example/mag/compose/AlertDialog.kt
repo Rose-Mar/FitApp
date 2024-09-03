@@ -53,13 +53,3 @@ fun AlertDialogExample(
         }
     )
 }
-
-//@Preview
-//@Composable
-//fun SimpleComposablePreview() {
-//    AlertDialogExample(
-//            dialogTitle = "Alert dialog example",
-//            dialogText = "This is an example of an alert dialog with buttons.",
-//            icon = Icons.Default.Info
-//        )
-//}

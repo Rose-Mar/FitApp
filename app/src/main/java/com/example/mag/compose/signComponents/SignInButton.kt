@@ -170,15 +170,14 @@ fun LoginButton(
 ){
     Row (
         modifier = Modifier
-            .fillMaxWidth()
             .padding(16.dp)
             .clickable { onClick() },
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
     ) {
         Icon(
             painter = icon,
             contentDescription = "Login with $appName",
-//            tint = MaterialTheme.colors.primary,
             modifier = Modifier.size(48.dp),
         )
         Spacer(modifier = Modifier.width(16.dp))

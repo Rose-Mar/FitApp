@@ -6,18 +6,11 @@ plugins {
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
     id("com.google.devtools.ksp")
     id("com.google.gms.google-services")
-
-
-
-
-
 }
 
 android {
     namespace = "com.example.mag"
     compileSdk = 34
-
-
     defaultConfig {
         applicationId = "com.example.mag"
         minSdk = 21
@@ -33,15 +26,12 @@ android {
         val properties = Properties()
         properties.load(project.rootProject.file("secrets.properties").inputStream())
         buildConfigField("String", "MAPS_API_KEY", properties.getProperty("MAPS_API_KEY"))
-
     }
-
     buildTypes {
         release {
             isMinifyEnabled = false
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
         }
     }
@@ -67,18 +57,10 @@ android {
 }
 
 secrets {
-    // Optionally specify a different file name containing your secrets.
-    // The plugin defaults to "local.properties"
     propertiesFileName = "secrets.properties"
-
-    // A properties file containing default secret values. This file can be
-    // checked in version control.
     defaultPropertiesFileName = "local.defaults.properties"
-
-    // Configure which keys should be ignored by the plugin by providing regular expressions.
-    // "sdk.dir" is ignored by default.
-    ignoreList.add("keyToIgnore") // Ignore the key "keyToIgnore"
-    ignoreList.add("sdk.*")       // Ignore all keys matching the regexp "sdk.*"
+    ignoreList.add("keyToIgnore")
+    ignoreList.add("sdk.*")
 }
 
 
@@ -91,13 +73,9 @@ dependencies {
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
     val room_version = "2.6.1"
-
     implementation("androidx.room:room-runtime:$room_version")
     annotationProcessor("androidx.room:room-compiler:$room_version")
-//    ksp("androidx.room:room-compiler:$room_version")
-
-
-
+    implementation("androidx.room:room-ktx:$room_version")
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation("androidx.activity:activity-compose:1.8.2")
@@ -112,7 +90,6 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
     implementation("com.google.android.gms:play-services-location-license:12.0.1")
-//    implementation("com.google.maps.android:android-maps-utils:4.3.0")
     implementation("com.google.maps.android:maps-ktx:3.1.0")
     implementation("com.google.maps.android:maps-compose:4.3.0")
     testImplementation("junit:junit:4.13.2")
@@ -125,7 +102,6 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     implementation("com.google.maps:google-maps-services:0.15.0")
 
-
     val lifecycle_version = "2.7.0"
 
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
@@ -135,21 +111,17 @@ dependencies {
     ksp("androidx.room:room-compiler:2.5.0")
 
     implementation("com.google.android.gms:play-services-location:21.1.0")
-
     implementation(platform("com.google.firebase:firebase-bom:32.7.3"))
-//    implementation("com.google.firebase:firebase-analytics")
-    implementation ("com.firebaseui:firebase-ui-auth:7.2.0")
-//    implementation ("com.facebook.android:facebook-android-sdk:17.0.0")
-
-    implementation ("androidx.navigation:navigation-compose:2.7.7")
-
+    implementation("com.firebaseui:firebase-ui-auth:7.2.0")
+    implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
-
-
-
-
-
-
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.1")
+    implementation("androidx.compose.runtime:runtime-livedata:1.3.0")
 
 
 }

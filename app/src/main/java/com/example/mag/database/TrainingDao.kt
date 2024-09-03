@@ -7,18 +7,23 @@ import androidx.room.Query
 
 @Dao
 interface TrainingDao {
-    @Query("SELECT * FROM training")
-    fun getAll(): List<Training>
+    @Insert
+    suspend fun insertTraining(training: Training)
 
-//    @Query("SELECT * FROM training WHERE tid IN (:trainingIds)")
-//    fun loadAllByIds(trainingIds: IntArray): List<Training>
-
+    @Query("SELECT * FROM trainings ORDER BY timestamp DESC")
+    suspend fun getAllTrainings(): List<Training>
 
     @Insert
     fun insertAll(vararg trainings: Training)
 
-//
-//    @Delete
-//    fun delete(training: Training)
-
+    @Delete
+    fun delete(training: Training)
 }
+
+
+
+
+
+
+
+

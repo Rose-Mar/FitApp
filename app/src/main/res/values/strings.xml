@@ -6,6 +6,7 @@
     <string name="title_activity_welcome">WelcomeActivity</string>
     <string name="web_client_id">697378465778-qvgmia55rkd6a5v1sgo9ap0is6ajjfsk.apps.googleusercontent.com</string>
     <string name="start_screen_text">Change your life with me!</string>
+    <string name="login_screen_text">"We're glad to have you back!"</string>
     <string name="enter_password">Enter Your Password</string>
     <string name="enter_username"> Enter Your Username</string>
     <string name="enter_email"> Enter Your Email</string>

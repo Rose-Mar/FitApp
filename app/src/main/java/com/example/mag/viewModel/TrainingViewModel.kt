@@ -1,54 +1,76 @@
 package com.example.mag.viewModel
 
-import android.content.Context
+import android.app.Application
+import android.content.pm.PackageManager
+import android.location.Location
+import android.os.Looper
 import android.util.Log
-import android.widget.Toast
-import androidx.compose.ui.graphics.Color
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.mag.database.AppDatabase
-import com.example.mag.database.Training
+import androidx.core.app.ActivityCompat
+import androidx.lifecycle.AndroidViewModel
+import com.google.android.gms.location.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import android.Manifest
 import com.example.mag.database.TrainingDao
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import java.util.UUID
 
+class TrainingViewModel(application: Application, private val trainingDao: TrainingDao) : AndroidViewModel(application) {
+    private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(application)
 
-class TrainingViewModel(private val trainingDao: TrainingDao): ViewModel() {
+    private val _location = MutableStateFlow<Location?>(null)
+    val location: StateFlow<Location?> = _location
 
+    private val _time = MutableStateFlow(0L)
+    val time: StateFlow<Long> = _time
 
-    var trainings: List<Training> = emptyList()
+    private val _distance = MutableStateFlow(0f)
+    val distance: StateFlow<Float> = _distance
 
-    fun addTraining(distance: String, trainingTime: String, calories: String, avgTime: String){
-        val newTraining = Training(
-            tid = UUID.randomUUID().toString(),
-            distance = distance,
-            trainingTime = trainingTime,
-            calories = calories,
-            avgTime = avgTime
-        )
+    private val _calories = MutableStateFlow(0f)
+    val calories: StateFlow<Float> = _calories
 
-        viewModelScope.launch(Dispatchers.IO) {
-            trainingDao.insertAll(newTraining)
+    private val _speed = MutableStateFlow(0f)
+    val speed: StateFlow<Float> = _speed
+
+    var requestingLocationUpdates = MutableStateFlow(false)
+    private var locationCallback: LocationCallback? = null
+
+    fun toggleLocationUpdates() {
+        if (requestingLocationUpdates.value) {
+            stopLocationUpdates()
+        } else {
+            startLocationUpdates()
         }
     }
 
-    fun showTrainings(){
+    fun startLocationUpdates() {
+        requestingLocationUpdates.value = true
+        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY,
+            5000)
+            .setWaitForAccurateLocation(false)
+            .setMinUpdateIntervalMillis(2000)
+            .setMaxUpdateDelayMillis(15000)
+            .build()
 
-        viewModelScope.launch(Dispatchers.IO) {
-            trainings = trainingDao.getAll()
-            Log.d("TrainingViewModel", "Trainings from database: $trainings")
+        locationCallback = object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult) {
+                for (location in locationResult.locations) {
+                    _location.value = location
+                    Log.d("TrainingViewModel", "Current Location: " +
+                            "Lat=${location.latitude}, Lon=${location.longitude}")
+                }
+            }
         }
-
+        if (ActivityCompat.checkSelfPermission(getApplication(),
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback!!,
+                Looper.getMainLooper())
+        }
     }
 
-
-    fun isDatabaseEmpty(): Boolean {
-        val trainings = trainingDao.getAll() // Assuming getAll() function retrieves all entries
-        return trainings.isEmpty()
-
-    }
-
-
-
+    private fun stopLocationUpdates() {
+        requestingLocationUpdates.value = false
+        locationCallback?.let {
+            fusedLocationClient.removeLocationUpdates(it)
         }
+    }
+}

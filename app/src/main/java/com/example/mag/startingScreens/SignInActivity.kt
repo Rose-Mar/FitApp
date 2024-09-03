@@ -1,7 +1,9 @@
 package com.example.mag.startingScreens
 
 import android.content.Context
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -29,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.mag.R
 import com.example.mag.compose.NormalTextInput
+import com.example.mag.compose.TitleTextComponent
 import com.example.mag.compose.signComponents.LoginButton
 import com.example.mag.compose.signComponents.PasswordTextInput
 import com.example.mag.compose.signComponents.SignInButton
@@ -46,10 +50,17 @@ fun SignIn(navController: NavController, context: Context) {
     }
 
 
-    Surface(
+    Box(
         modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
+
     ) {
+        Image(
+            painter = painterResource(id = R.drawable.background2),
+
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
 
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -57,7 +68,12 @@ fun SignIn(navController: NavController, context: Context) {
             horizontalAlignment = Alignment.CenterHorizontally
         ){
 
+            TitleTextComponent(
+                value = stringResource(id = R.string.login_screen_text)
+            )
+
             NormalTextInput(
+                label = stringResource(id = R.string.enter_email),
                 value = stringResource(id = R.string.enter_email),
                 onValueChanged = { newValue -> email = newValue },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
@@ -69,7 +85,8 @@ fun SignIn(navController: NavController, context: Context) {
                 onValueChanged = { newValue -> password = newValue }
             )
 
-            SignInButton(navController = navController, email = email, password = password, context = context)
+            SignInButton(navController = navController,
+                email = email, password = password, context = context)
 
 
             Row(
