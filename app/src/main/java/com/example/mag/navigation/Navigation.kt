@@ -56,6 +56,7 @@ fun Navigation(coroutineScope: CoroutineScope, context: Context) {
         composable(route = "RandomPathTry/{distance}") { backStackEntry ->
             val distance = backStackEntry.arguments?.getString("distance")?.toInt() ?: 5
             RandomPathTry(navController = navController, context = context, distance = distance)
+
         }
     }
 }
